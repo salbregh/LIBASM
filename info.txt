@@ -1,0 +1,49 @@
+Registers:
+Each register is 64 bits wide, the lower 32- 16- and 8-bit portions
+are selectable by a pseudoregister name. Some registers have a certain
+purpose.
+- rsp: being used as the stack pointer
+- rax: the return value from a function
+Other registers are all-purpse but have a conventional use depeding on
+whether caller-owned or callee owned. 
+If binky calls winky, binky is the caller and winky is the callee.
+The registers used for the first 6 arguments and return value ar callee
+owned. The callee can freely use those registers, and overwrite values.
+If rax holds a value that caller wants to retain, the caller must copy
+the value before making a call. The callee-owned registers are ideal
+for scratch.temprary use.
+If the callee intends to use a caller-owned register, it must preserve
+its value and restore it before exiting the call. The caller-owned 
+registers are used for local state of the caller that needs to  be
+preserved across further function calls.
+
+rax     return value, callee owned		eax		ax		al
+rdi     1st argument, callee owned		edi		di		dil
+rsi		2nd argument, callee owned		esi		si		sil
+rdx		3rd argument, callee owned		edx		dx		dl
+rcx		4th argument, callee owned 		ecx		cx		cl
+r8		5th argument, callee owned		r8d		r8w		r8b
+r9		6th argument, callee owned		r9d		r9w		r9b
+r10		scratch/temporary, callee owned	r10d	r10w	r10b
+r11		scratch/temporary, callee owned	r11d	r11w	r11b
+rsp		stack pointer, caller-owned		esp		sp 		spl
+rbx		local variable, caller owned	ebx		bx		bl
+rbp		local variable, caller owned 	ebp		bp		bpl
+r12		local variable, caller owned	r12d	r12w	r12b
+r13		local variable, caller owned	r13d	r13w	r13b
+r14		local variable, caller owned	r14d	r14w	r14b
+r15		local variable, caller owned	r15d	r15w	r15b
+rip		instructor pointer
+eflags	status/condition code bits
+
+
+ERRNO
+The value of errno shall be defined only after a call to a function
+for which it is explicitly stated to be set and until it is changed
+by the next function call or if the application assigns it a value.
+The value of errno should only be examined when it is indicated to be
+valid by a function's return value. Applications shall obtain the
+definition of errno by the inclusion of <errno.h>. No function in 
+shall set errno to 0. The setting of errno after a successful call to
+a function is unspecified unless the description of that function 
+specifies that errno shall not be modified.
