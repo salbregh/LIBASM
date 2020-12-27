@@ -47,3 +47,58 @@ definition of errno by the inclusion of <errno.h>. No function in
 shall set errno to 0. The setting of errno after a successful call to
 a function is unspecified unless the description of that function 
 specifies that errno shall not be modified.
+
+
+File management in assembly:
+
+An fd is a 16-bot integer assigned to a file as a file id. When a new
+file is created or an existing file is openen, the fd is used to acces
+the file.
+File descriptors of the standard file streams:
+- standard input (stdin) 0
+- standard output (stdout) 1
+- standard error (stderr) 2
+
+A file pointer specifies the location for a read/write operation in the
+file in terms of bytes. Each file is considererd as a sequence of bytes,
+and open file is associated with a file pointer that specifies an offset
+in bytes, relative to the beginning of the file. When a file is opened, 
+the file pointer is set to zero.
+
+System calls related to file handling:
+eax		name			ebx					ecx				edx
+2		sys_fork		struct pt_regs		-				-
+3		sys_read		unsigned int		char *			size_t
+4		sys_write		unsigned int		const char *	size_t
+5		sys_open		const char *		int				int
+6		sys_close		unsigned int 		-				-
+8		sys_creat		const char *		int				-
+19		sys_lseek		unsigned int		off_t			unsigned int
+
+The system call number need to add an offset off 0x2000000,
+because OSX has 4 different class of system calls
+
+HOW TO USE:
+- put system call number in the EAX register
+- store the arguments to the system call in the registers EBX, ECX, EDX
+- result is usually returned in the EAX register
+
+WRITING TO A FILE:
+- put the system call sys_write() number 4, in the EAX register
+- put the file descriptor in the EBX register
+- put the pointer to the output buffer in the EXC register
+- put the buffer size (the number of bytes to write) in the EDX registser
+The system call returns the actual number of bytes written in the EAX
+register, in case of error the error code is in the EAX register.
+
+READING FROM A FILE:
+- put the system call sys_read() number 3, in the EAX register
+- put the file descriptor in the EBX register
+- put the pointer to the input buffer in the ECX register
+- put the buffer size (number of bytes to read) in the EDX register
+The system call returns the number of bytes read in the EAX register,
+in case of error the error code is in the EAX register
+
+The register used for syscall are different, it uses rdi, rsi, rdx, r10
+r8 and r9. You cannot pass more than 6 parameters in syscall nor can you
+put the parameters on the stack.

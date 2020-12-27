@@ -6,7 +6,7 @@
 /*   By: salbregh <salbregh@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2020/12/22 14:03:43 by salbregh      #+#    #+#                 */
-/*   Updated: 2020/12/25 17:57:34 by salbregh      ########   odam.nl         */
+/*   Updated: 2020/12/26 22:22:42 by salbregh      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,26 @@ void	ft_strdup_test(char *src)
 		printf(GRN"TEST OK\n\n"RESET);
 }
 
+void	ft_write_test(int fd, char *buf, size_t count)
+{
+	int		errorwrite;
+
+	printf(YEL"Official write function: \n"RESET);
+	printf(BLU"To be written:\n"RESET);
+	printf(CYN);
+	printf("\nReturn of write: %zd\n", write(fd, buf, count));
+	errorwrite = errno;
+	if (errorwrite != 0)
+		printf("%d, %s\n", errorwrite, strerror(errorwrite));
+	printf(YEL"My write function: \n"RESET);
+	printf(BLU"To be written:\n"RESET);
+	printf(CYN);
+	printf("\nReturn of write: %zd\n", ft_write(fd, buf, count));
+	errorwrite = errno;
+	if (errorwrite != 0)
+		printf("%d, %s\n", errorwrite, strerror(errorwrite));
+}
+
 int		main(int argc, char **argv)
 {
 	if (argc != 2)
@@ -147,6 +167,15 @@ int		main(int argc, char **argv)
 		ft_strdup_test("test\nthis");
 		return (0);
 	}
+	if (ft_strcmp(argv[1], "write") == 0)
+	{
+		printf(MAG"--------------\n");
+		printf("| TEST WRITE |\n");
+		printf("--------------\n\n"RESET);
+		ft_write_test(1, "TEST\n", 10); // change
+		ft_write_test(6, "TEST\n", 10); // change
+	}
+
 	else
 		printf(RED"FUNCTION NOT FOUND\n"RESET);
 	return (0);
