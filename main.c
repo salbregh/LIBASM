@@ -6,7 +6,7 @@
 /*   By: salbregh <salbregh@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2020/12/22 14:03:43 by salbregh      #+#    #+#                 */
-/*   Updated: 2020/12/26 22:22:42 by salbregh      ########   odam.nl         */
+/*   Updated: 2020/12/27 19:00:20 by salbregh      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,10 +75,11 @@ void	ft_strdup_test(char *src)
 	int		errorreal;
 	int		errormine;
 
-
+	errno = 0;
 	dupreal = strdup(src);
 	errorreal = errno; // errno of strdup set after calling the function
 	dupmine = ft_strdup(src);
+	errno = 0;
 	errormine = errno; // errno of ft_strdup set after calling the function
 	printf(BLU"String to duplicate:\n"CYN"%s\n", src);
 	printf(BLU"Result of strdup:\n"CYN"%s\n", dupreal);
@@ -88,28 +89,70 @@ void	ft_strdup_test(char *src)
 	if (errormine != 0)
 		printf(BLU"Errno of my ft_strdup "CYN"%s\n", strerror(errormine));
 	// check if the address is the same
-	if (strcmp(src, dupmine) == 0 && (&dupreal != &dupmine))
+	if (strcmp(src, dupmine) == 0 && (&dupreal != &dupmine) && errormine == errorreal)
 		printf(GRN"TEST OK\n\n"RESET);
+	else
+		printf(RED"TEST FAIL\n"RESET);
 }
 
 void	ft_write_test(int fd, char *buf, size_t count)
 {
-	int		errorwrite;
+	int		errorreal;
+	int		errormine;
+	int		returnreal;
+	int		returnmine;
 
-	printf(YEL"Official write function: \n"RESET);
-	printf(BLU"To be written:\n"RESET);
-	printf(CYN);
-	printf("\nReturn of write: %zd\n", write(fd, buf, count));
-	errorwrite = errno;
-	if (errorwrite != 0)
-		printf("%d, %s\n", errorwrite, strerror(errorwrite));
-	printf(YEL"My write function: \n"RESET);
-	printf(BLU"To be written:\n"RESET);
-	printf(CYN);
-	printf("\nReturn of write: %zd\n", ft_write(fd, buf, count));
-	errorwrite = errno;
-	if (errorwrite != 0)
-		printf("%d, %s\n", errorwrite, strerror(errorwrite));
+	errno = 0;
+	printf(YEL"\nOfficial write function: \n"RESET);
+	printf(BLU"To be written:\n");
+	if (fd != 1)
+		printf("%s\n", buf);
+	printf("\nReturn of write: %d\n", returnreal = write(fd, buf, count));
+	errorreal = errno;
+	if (errorreal != 0)
+		printf("%d, %s\n", errorreal, strerror(errorreal));
+	errno = 0;
+	printf(YEL"\nMy write function: \n"RESET);
+	printf(CYN"To be written:\n");
+	if (fd != 1)
+		printf("%s\n", buf);
+	printf("\nReturn of write: %d\n", returnmine = ft_write(fd, buf, count));
+	errormine = errno;
+	if (errormine != 0)
+		printf("%d, %s\n", errormine, strerror(errormine));
+	if (returnmine == returnreal && errormine == errorreal)
+		printf(GRN"\nTEST OK\n"RESET);
+	else
+		printf(RED"\nTEST FAIL\n"RESET);
+}
+
+void	ft_read_test(int fd, char *buf, size_t count)
+{
+	int		errorreal;
+	int		errormine;
+	int		returnreal;
+	int		returnmine;
+
+	// printf(YEL"BEGIN VALUES\n"RESET);
+	// printf("value of buf: %s\n", buf);
+	// printf("value of fd: %d\n", fd);
+	// printf("value of count: %zd\n", count);
+	errno = 0;
+	printf(YEL"\nOfficial read function\n"RESET);
+	returnreal = read(fd, buf, count);
+	printf("Buf contains:\n%s\n", buf);
+	errorreal = errno;
+	printf(BLU"Return real:\n"CYN"%d\n"RESET, returnreal);
+	if (errorreal != 0)
+		printf("Error real: %d\n", errorreal);
+	errno = 0;
+	printf(YEL"My read function\n"RESET);
+	returnmine = ft_read(fd, buf, count);
+	printf("Buf contains:\n%s\n", buf);
+	errormine = errno;
+	printf("Return mine: %d\n", returnmine);
+	if (errormine != 0)
+		printf("Error mine: %d\n", errormine);
 }
 
 int		main(int argc, char **argv)
@@ -171,9 +214,37 @@ int		main(int argc, char **argv)
 	{
 		printf(MAG"--------------\n");
 		printf("| TEST WRITE |\n");
-		printf("--------------\n\n"RESET);
-		ft_write_test(1, "TEST\n", 10); // change
-		ft_write_test(6, "TEST\n", 10); // change
+		printf("--------------\n"RESET);
+		ft_write_test(1, "Hellooo\n", 8);
+		ft_write_test(1, "Hellooo\n", 2);
+		ft_write_test(6, "TEST\n", 10);
+		ft_write_test(1, "TEST\n", -1);
+		int		fd;
+		fd = open("text", O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+		if (fd < 0)
+			return (-1);
+		ft_write_test(fd, "WRITE IN TEST FILE\n", 19);
+		ft_write_test(fd, "one more line\n", 14);
+		close(fd);
+		return (0);
+	}
+	if (ft_strcmp(argv[1], "read") == 0)
+	{
+		char	buf[100];
+		int		fd;
+
+		bzero(buf, sizeof(buf));
+		fd = open("readfile", O_RDONLY, O_CREAT | O_TRUNC, S_IRWXU);
+		printf(MAG"-------------\n");
+		printf("| TEST READ |\n");
+		printf("-------------\n\n"RESET);
+		
+		ft_read_test(fd ,buf, 50);
+		bzero(buf, sizeof(buf));
+		ft_read_test(fd, buf, -1);
+		bzero(buf, sizeof(buf));
+		ft_read_test(6, buf, 100);
+		return (0);
 	}
 
 	else

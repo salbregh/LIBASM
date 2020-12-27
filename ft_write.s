@@ -10,8 +10,7 @@ extern ___error
 _ft_write:
 	mov		rax, 0x2000004		; systemcall number for write
 	syscall						; envoke system to do the write
-	cmp		rax, -1				; see if write failed
-	je		error				; jump to error if -1 
+	jc		error				; jump if carry 
 	ret
 
 error:

@@ -6,7 +6,7 @@
 #    By: salbregh <salbregh@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2020/12/22 14:35:59 by salbregh      #+#    #+#                  #
-#    Updated: 2020/12/24 13:21:12 by salbregh      ########   odam.nl          #
+#    Updated: 2020/12/27 16:35:46 by salbregh      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -43,6 +43,7 @@ clean:
 fclean:		clean
 			@/bin/rm -f $(NAME)
 			@/bin/rm -f test
+			@/bin/rm -f text
 
 re: 		fclean all
 

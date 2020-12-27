@@ -6,7 +6,7 @@
 /*   By: salbregh <salbregh@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2020/12/22 13:41:35 by salbregh      #+#    #+#                 */
-/*   Updated: 2020/12/26 14:15:34 by salbregh      ########   odam.nl         */
+/*   Updated: 2020/12/27 16:20:57 by salbregh      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <strings.h>
 # include <errno.h>
 # include <unistd.h>
+# include <fcntl.h>
 
 # define RED   "\033[1m\33[31m"
 # define GRN   "\033[1m\33[32m"
