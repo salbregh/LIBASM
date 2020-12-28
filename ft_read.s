@@ -3,5 +3,14 @@ global _ft_read
 extern ___error
 
 _ft_read:
-	mov		rax, 1
+	mov		rax, 0x2000003		; symstemcall for read
+	syscall						; envoke system to do the read
+	jc		error				; jump if carry flag
 	ret
+
+error:
+	mov		r8, rax;			; save errno value in r8
+    call    ___error        	; error returns address of errno
+    mov     [rax], r8      		; set value of errno
+    mov     rax, -1
+    ret

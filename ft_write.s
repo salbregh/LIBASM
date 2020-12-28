@@ -2,15 +2,10 @@ section .text
 global _ft_write
 extern ___error
 
-; rdi 1st argument holds the file descriptor
-; rsi 2nd argument holds the string to be written
-; rdx 3rd argument holds the count
-; use r8 r9 or r10 for other variables
-
 _ft_write:
 	mov		rax, 0x2000004		; systemcall number for write
 	syscall						; envoke system to do the write
-	jc		error				; jump if carry 
+	jc		error				; jump if carry flag
 	ret
 
 error:

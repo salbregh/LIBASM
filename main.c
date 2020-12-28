@@ -6,7 +6,7 @@
 /*   By: salbregh <salbregh@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2020/12/22 14:03:43 by salbregh      #+#    #+#                 */
-/*   Updated: 2020/12/27 19:00:20 by salbregh      ########   odam.nl         */
+/*   Updated: 2020/12/28 15:43:51 by salbregh      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,10 +77,10 @@ void	ft_strdup_test(char *src)
 
 	errno = 0;
 	dupreal = strdup(src);
-	errorreal = errno; // errno of strdup set after calling the function
+	errorreal = errno;
 	dupmine = ft_strdup(src);
 	errno = 0;
-	errormine = errno; // errno of ft_strdup set after calling the function
+	errormine = errno;
 	printf(BLU"String to duplicate:\n"CYN"%s\n", src);
 	printf(BLU"Result of strdup:\n"CYN"%s\n", dupreal);
 	if (errorreal != 0)
@@ -88,7 +88,6 @@ void	ft_strdup_test(char *src)
 	printf(BLU"Result of ft_strdup:\n"CYN"%s\n", dupmine);
 	if (errormine != 0)
 		printf(BLU"Errno of my ft_strdup "CYN"%s\n", strerror(errormine));
-	// check if the address is the same
 	if (strcmp(src, dupmine) == 0 && (&dupreal != &dupmine) && errormine == errorreal)
 		printf(GRN"TEST OK\n\n"RESET);
 	else
@@ -110,7 +109,7 @@ void	ft_write_test(int fd, char *buf, size_t count)
 	printf("\nReturn of write: %d\n", returnreal = write(fd, buf, count));
 	errorreal = errno;
 	if (errorreal != 0)
-		printf("%d, %s\n", errorreal, strerror(errorreal));
+		printf("Error real:\n%d, %s\n", errorreal, strerror(errorreal));
 	errno = 0;
 	printf(YEL"\nMy write function: \n"RESET);
 	printf(CYN"To be written:\n");
@@ -119,40 +118,40 @@ void	ft_write_test(int fd, char *buf, size_t count)
 	printf("\nReturn of write: %d\n", returnmine = ft_write(fd, buf, count));
 	errormine = errno;
 	if (errormine != 0)
-		printf("%d, %s\n", errormine, strerror(errormine));
+		printf("Error mine:\n%d, %s\n", errormine, strerror(errormine));
 	if (returnmine == returnreal && errormine == errorreal)
 		printf(GRN"\nTEST OK\n"RESET);
 	else
 		printf(RED"\nTEST FAIL\n"RESET);
 }
 
-void	ft_read_test(int fd, char *buf, size_t count)
+void	ft_read_test(int fd, int fd2, char *buf, size_t count)
 {
 	int		errorreal;
 	int		errormine;
 	int		returnreal;
 	int		returnmine;
 
-	// printf(YEL"BEGIN VALUES\n"RESET);
-	// printf("value of buf: %s\n", buf);
-	// printf("value of fd: %d\n", fd);
-	// printf("value of count: %zd\n", count);
 	errno = 0;
 	printf(YEL"\nOfficial read function\n"RESET);
 	returnreal = read(fd, buf, count);
-	printf("Buf contains:\n%s\n", buf);
 	errorreal = errno;
 	printf(BLU"Return real:\n"CYN"%d\n"RESET, returnreal);
 	if (errorreal != 0)
-		printf("Error real: %d\n", errorreal);
+		printf(BLU"Error real:\n"CYN"%d: %s\n"RESET, errorreal, strerror(errorreal));
 	errno = 0;
 	printf(YEL"My read function\n"RESET);
-	returnmine = ft_read(fd, buf, count);
-	printf("Buf contains:\n%s\n", buf);
+	returnmine = ft_read(fd2, buf, count);
 	errormine = errno;
-	printf("Return mine: %d\n", returnmine);
+	printf(BLU"Return mine:\n"CYN"%d\n", returnmine);
 	if (errormine != 0)
-		printf("Error mine: %d\n", errormine);
+		printf(BLU"Error mine:\n"CYN" %d: %s\n"RESET, errormine, strerror(errormine));
+	if (errormine == errorreal && returnreal == returnmine)
+		printf(GRN"TEST OK\n\n"RESET);
+	else
+		printf(RED"TEST FAIL\n\n"RESET);
+	close(fd);
+		close(fd2);
 }
 
 int		main(int argc, char **argv)
@@ -179,8 +178,8 @@ int		main(int argc, char **argv)
 		printf(MAG"---------------\n");
 		printf("| TEST STRCMP |\n");
 		printf("---------------\n\n"RESET);	
-		ft_strcmp_test("Hello", "Hello"); // goes wrong when same length
-		ft_strcmp_test("", ""); // goes wrong because some length
+		ft_strcmp_test("Hello", "Hello");
+		ft_strcmp_test("", "");
 		ft_strcmp_test("Hello", "");
 		ft_strcmp_test("", "Hello");
 		ft_strcmp_test("HOI", "hoi");
@@ -232,18 +231,29 @@ int		main(int argc, char **argv)
 	{
 		char	buf[100];
 		int		fd;
-
-		bzero(buf, sizeof(buf));
-		fd = open("readfile", O_RDONLY, O_CREAT | O_TRUNC, S_IRWXU);
+		int		fd2;
+		
 		printf(MAG"-------------\n");
 		printf("| TEST READ |\n");
 		printf("-------------\n\n"RESET);
-		
-		ft_read_test(fd ,buf, 50);
 		bzero(buf, sizeof(buf));
-		ft_read_test(fd, buf, -1);
+		fd = open("readfile", O_RDONLY, O_CREAT | O_TRUNC, S_IRWXU);
+		fd2 = open("readfile", O_RDONLY, O_CREAT | O_TRUNC, S_IRWXU);
+		ft_read_test(fd, fd2, buf, 15);
 		bzero(buf, sizeof(buf));
-		ft_read_test(6, buf, 100);
+		fd = open("readfile", O_RDONLY, O_CREAT | O_TRUNC, S_IRWXU);
+		fd2 = open("readfile", O_RDONLY, O_CREAT | O_TRUNC, S_IRWXU);
+		ft_read_test(fd, fd2, buf, 10);
+		bzero(buf, sizeof(buf));
+		fd = open("readfile", O_RDONLY, O_CREAT | O_TRUNC, S_IRWXU);
+		fd2 = open("readfile", O_RDONLY, O_CREAT | O_TRUNC, S_IRWXU);
+		ft_read_test(fd, fd2, buf, -1);
+		bzero(buf, sizeof(buf));
+		ft_read_test(42, 42, buf, 100);
+		bzero(buf, sizeof(buf));
+		fd = open("readfile", O_RDONLY, O_CREAT | O_TRUNC, S_IRWXU);
+		fd2 = open("readfile", O_RDONLY, O_CREAT | O_TRUNC, S_IRWXU);
+		ft_read_test(fd, fd2, buf, 0);
 		return (0);
 	}
 
