@@ -17,4 +17,4 @@ compare:
 return:
 	sub		al, cl					; calculate the diffence and put in al
 	movsx	rax, al					; put diff in rax
-	ret
+	ret								; return diff

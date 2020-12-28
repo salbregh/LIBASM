@@ -1,9 +1,6 @@
 section .text
 global _ft_strcpy
 
-; rsi is the src
-; rdi is the destination
-
 _ft_strcpy:
 	mov		rdx, -1						; i = -1
 

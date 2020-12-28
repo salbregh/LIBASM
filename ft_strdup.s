@@ -4,15 +4,10 @@ extern _malloc
 extern _ft_strlen
 extern _ft_strcpy
 extern ___error
-extern _puts
-
-; rdi is src
-; rsi is de dst
-; rdx is i
 
 _ft_strdup:
     cmp		rdi, 0			; compare is src is NULL
-	je		error			; if src is NULL return
+	je		null			; if src is NULL return
 	
 	push	rdi				; save register that strlen uses
 	call	_ft_strlen		; use ft_strlen on source
@@ -25,6 +20,9 @@ _ft_strdup:
 	mov		rdi, rax		; put content in rdi
 	pop		rsi				; src for use strcpy
 	call	_ft_strcpy
+	ret
+
+null:
 	ret
 
 error:
